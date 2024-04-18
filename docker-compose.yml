@@ -17,7 +17,7 @@ services:
     networks:
       - snipeit
 
-  snipeit:
+  snipe-it:
     image: lscr.io/linuxserver/snipe-it:latest
     container_name: snipe-it
     environment:

@@ -9,7 +9,7 @@
     output file /var/log/caddy.log
   }
 
-  reverse_proxy snipeit:8080
+  reverse_proxy http://snipe-it
 
   header / {
     Strict-Transport-Security max-age=31536000; includeSubDomains; preload;
