@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  mariadb:
+    container_name: mariadb
+    hostname: mariadb
+    image: lscr.io/linuxserver/mariadb:latest
+    restart: always
+    volumes:
+      - ./data/db:/config
+    networks:
+      - snipeit
+
+  snipeit:
+    image: lscr.io/linuxserver/snipe-it:latest
+    container_name: snipe-it
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - APP_URL=https://$SITE_DOMAIN
+      - MYSQL_PORT_3306_TCP_ADDR=mariadb
+      - MYSQL_PORT_3306_TCP_PORT=3306
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_LOCALE=en
+    volumes:
+      - ./data/snipeit:/config
+    restart: unless-stopped
+
+  caddy:
+    container_name: caddy
+    hostname: caddy
+    image: caddy:alpine
+    restart: always
+    volumes:
+      - ./data/Caddyfile:/etc/caddy/Caddyfile
+      - ./data/caddy/data:/data
+      - ./data/caddy/config:/config
+      - /var/log:/var/log
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    networks:
+      - snipeit
+
+networks:
+  snipeit:
+    driver: bridge
+    name: snipeit
