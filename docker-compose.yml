@@ -35,6 +35,8 @@ services:
     volumes:
       - ./data/snipeit:/config
     restart: unless-stopped
+    networks:
+      - snipeit
 
   caddy:
     container_name: caddy
