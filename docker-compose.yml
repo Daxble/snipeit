@@ -15,7 +15,7 @@ services:
     volumes:
       - ./data/db:/config
     networks:
-      - snipeit
+      - snipe-it
 
   snipe-it:
     image: lscr.io/linuxserver/snipe-it:latest
@@ -33,10 +33,10 @@ services:
       - APP_DEBUG=false
       - APP_LOCALE=en
     volumes:
-      - ./data/snipeit:/config
+      - ./data/snipe-it:/config
     restart: unless-stopped
     networks:
-      - snipeit
+      - snipe-it
 
   caddy:
     container_name: caddy
@@ -55,9 +55,9 @@ services:
       - "443:443"
       - "443:443/udp"
     networks:
-      - snipeit
+      - snipe-it
 
 networks:
-  snipeit:
+  snipe-it:
     driver: bridge
-    name: snipeit
+    name: snipe-it
