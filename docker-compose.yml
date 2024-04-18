@@ -32,7 +32,7 @@ services:
     image: caddy:alpine
     restart: always
     volumes:
-      - ./data/Caddyfile:/etc/caddy/Caddyfile
+      - ./data/caddy/Caddyfile:/etc/caddy/Caddyfile
       - ./data/caddy/data:/data
       - ./data/caddy/config:/config
       - /var/log:/var/log
