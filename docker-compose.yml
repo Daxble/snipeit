@@ -5,6 +5,13 @@ services:
     hostname: mariadb
     image: lscr.io/linuxserver/mariadb:latest
     restart: always
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
     volumes:
       - ./data/db:/config
     networks:
@@ -19,6 +26,9 @@ services:
       - APP_URL=https://$SITE_DOMAIN
       - MYSQL_PORT_3306_TCP_ADDR=mariadb
       - MYSQL_PORT_3306_TCP_PORT=3306
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - APP_ENV=production
       - APP_DEBUG=false
       - APP_LOCALE=en
@@ -36,6 +46,8 @@ services:
       - ./data/caddy/data:/data
       - ./data/caddy/config:/config
       - /var/log:/var/log
+    environment:
+      - SITE_DOMAIN=${SITE_DOMAIN}
     ports:
       - "80:80"
       - "443:443"
