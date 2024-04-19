@@ -17,36 +17,45 @@ services:
     networks:
       - snipe-it
 
-  postgres:
-    container_name: postgres
-    image: postgres:latest
+  trudesk:
+    image: polonel/trudesk:1
     restart: always
-    volumes:
-      - ./data/postgres-db:/var/lib/postgresql/data
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      NODE_ENV: production
+      TRUDESK_DOCKER: "true"
+      TD_MONGODB_SERVER: mongo
+      TD_MONGODB_DATABASE: trudesk
+      USE_XFORWARDIP: "true"
+    volumes:
+      - ./data/trudesk/uploads:/usr/src/trudesk/public/uploads
+      - ./data/trudesk/backups:/usr/src/trudesk/backups
     networks:
       - snipe-it
 
-  peppermint:
-    container_name: peppermint
-    image: pepperlabs/peppermint:latest
+  mongo:
+    image: mongo:5.0-focal
     restart: always
-    depends_on:
-      - postgres
-    healthcheck:
-      test: ["CMD", "sh", "-c", "wget --spider $$API_URL"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    volumes:
+      - ./data/mongo/lib:/var/lib/mongo
+      - ./data/mongo/data:/data/db:rw
+    networks:
+      - snipe-it
+
+  elasticsearch:
+    image: elasticsearch:8.0.0
+    restart: always
     environment:
-      DB_USERNAME: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
-      DB_HOST: "postgres"
-      SECRET: ${PEPPERMINT_SECRET}
-      API_URL: ${PEPPERMINT_API_DOMAIN}
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+    mem_limit: 1073741824
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data
     networks:
       - snipe-it
 
@@ -83,8 +92,7 @@ services:
       - /var/log:/var/log
     environment:
       - SNIPE_DOMAIN=${SNIPE_DOMAIN}
-      - PEPPERMINT_DOMAIN=${PEPPERMINT_DOMAIN}
-      - PEPPERMINT_API_DOMAIN=${PEPPERMINT_API_DOMAIN}
+      - TRUDESK_DOMAIN=${TRUDESK_DOMAIN}
     ports:
       - "80:80"
       - "443:443"
