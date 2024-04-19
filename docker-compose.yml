@@ -17,13 +17,46 @@ services:
     networks:
       - snipe-it
 
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    restart: always
+    volumes:
+      - ./data/postgres-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - snipe-it
+
+  peppermint:
+    container_name: peppermint
+    image: pepperlabs/peppermint:latest
+    restart: always
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget --spider $$API_URL"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    environment:
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_HOST: "postgres"
+      SECRET: ${PEPPERMINT_SECRET}
+      API_URL: ${PEPPERMINT_API_DOMAIN}
+    networks:
+      - snipe-it
+
   snipe-it:
     image: lscr.io/linuxserver/snipe-it:latest
     container_name: snipe-it
     environment:
       - PUID=1000
       - PGID=1000
-      - APP_URL=https://$SITE_DOMAIN
+      - APP_URL=https://$SNIPE_DOMAIN
       - MYSQL_PORT_3306_TCP_ADDR=mariadb
       - MYSQL_PORT_3306_TCP_PORT=3306
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -49,7 +82,9 @@ services:
       - ./data/caddy/config:/config
       - /var/log:/var/log
     environment:
-      - SITE_DOMAIN=${SITE_DOMAIN}
+      - SNIPE_DOMAIN=${SNIPE_DOMAIN}
+      - PEPPERMINT_DOMAIN=${PEPPERMINT_DOMAIN}
+      - PEPPERMINT_API_DOMAIN=${PEPPERMINT_API_DOMAIN}
     ports:
       - "80:80"
       - "443:443"
