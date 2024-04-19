@@ -17,33 +17,14 @@
   }
 }
 
-{$PEPPERMINT_DOMAIN} {    
+{$TRUDESK_DOMAIN} {    
   encode gzip
 
   log {
     output file /var/log/caddy.log
   }
 
-  reverse_proxy http://peppermint:3000
-
-  header / {
-    Strict-Transport-Security max-age=31536000; includeSubDomains; preload;
-    X-Frame-Options SAMEORIGIN
-    X-Content-Type-Options nosniff
-    Referrer-Policy strict-origin
-    X-XSS-Protection 1; mode-block
-    Permissions-Policy fullscreen=(self)
-  }
-}
-
-{$PEPPERMINT_API_DOMAIN} {    
-  encode gzip
-
-  log {
-    output file /var/log/caddy.log
-  }
-
-  reverse_proxy http://peppermint:5003
+  reverse_proxy http://trudesk:8118
 
   header / {
     Strict-Transport-Security max-age=31536000; includeSubDomains; preload;
