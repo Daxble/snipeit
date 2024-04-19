@@ -19,6 +19,7 @@ services:
 
   trudesk:
     image: polonel/trudesk:1
+    container_name: trudesk
     restart: always
     environment:
       NODE_ENV: production
@@ -34,6 +35,7 @@ services:
 
   mongo:
     image: mongo:5.0-focal
+    container_name: mongo
     restart: always
     volumes:
       - ./data/mongo/lib:/var/lib/mongo
@@ -43,6 +45,7 @@ services:
 
   elasticsearch:
     image: elasticsearch:8.0.0
+    container_name: elasticsearch
     restart: always
     environment:
       - xpack.security.enabled=false
